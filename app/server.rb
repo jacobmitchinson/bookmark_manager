@@ -1,8 +1,11 @@
 require 'sinatra/base'
 
+require './lib/database_setup'
+
 class BookmarkManager < Sinatra::Base
 
-  set :views, File.expand_path('../../views', __FILE__)
+  # set :views, File.expand_path('../../views', __FILE__)
+  set :views, Proc.new { File.join(root, "views") }
 
   get '/' do
     @links = Link.all

@@ -1,12 +1,10 @@
-require 'data_mapper'
-require_relative 'bookmark_manager'
+require 'dm-postgres-adapter'
 
-env = ENV['RACK_ENV'] || "development"
+env = ENV['RACK_ENV'] || 'development'
 
 DataMapper.setup(:default, "postgres://localhost/bookmark_manager_#{env}")
 
 require './lib/link'
 
 DataMapper.finalize
-
 DataMapper.auto_upgrade!
