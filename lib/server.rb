@@ -1,4 +1,5 @@
 require 'data_mapper'
+require_relative 'bookmark_manager'
 
 env = ENV['RACK_ENV'] || "development"
 
