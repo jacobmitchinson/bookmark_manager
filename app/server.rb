@@ -1,5 +1,7 @@
 require 'sinatra/base'
 
+require './lib/user'
+
 require './lib/tag'
 
 require './lib/database_setup'
@@ -26,8 +28,18 @@ class BookmarkManager < Sinatra::Base
     redirect to('/')
   end
 
+  get '/users/new' do 
+    erb :"users/new"
+  end
+
+  post '/users' do 
+    User.create(:email => params[:email],
+                       :password => params[:password])
+    redirect to('/')
+  end
+
   get '/tags/:text' do
-    tag =Tag.first(:text => params[:text])
+    tag = Tag.first(:text => params[:text])
     @links = tag ? tag.links : []
     erb :index
   end
