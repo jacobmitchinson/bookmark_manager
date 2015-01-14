@@ -6,19 +6,16 @@ require './lib/tag'
 
 require './lib/database_setup'
 
+require_relative './helpers/application_helper'
+
 class BookmarkManager < Sinatra::Base
   enable :sessions
   set :session_secret, 'super_secret'
 
   # set :views, File.expand_path('../../views', __FILE__)
   set :views, Proc.new { File.join(root, "views") }
-  helpers do
-
-    def current_user
-      @current_user ||=User.get(session[:user_id]) if session[:user_id]
-    end
-    
-  end
+  
+  helpers ApplicationHelper
 
   get '/' do
     @links = Link.all
