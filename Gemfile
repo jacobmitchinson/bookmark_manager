@@ -5,6 +5,7 @@ gem 'data_mapper'
 gem 'dm-postgres-adapter'
 gem 'database_cleaner'
 gem 'bcrypt-ruby'
+gem 'rack-flash3'
 
 group :development, :test do
   gem 'capybara'
@@ -13,4 +14,5 @@ group :development, :test do
   gem 'launchy'
   gem 'rspec'
   gem 'shotgun'
+  gem 'byebug'
 end

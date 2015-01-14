@@ -6,9 +6,12 @@ require './lib/tag'
 
 require './lib/database_setup'
 
+require 'rack-flash'
+
 require_relative './helpers/application_helper'
 
 class BookmarkManager < Sinatra::Base
+  use Rack::Flash
   enable :sessions
   set :session_secret, 'super_secret'
 
@@ -35,15 +38,22 @@ class BookmarkManager < Sinatra::Base
   end
 
   get '/users/new' do 
+    @user = User.new
     erb :"users/new"
   end
 
   post '/users' do 
-    user = User.create(:email => params[:email],
+    @user = User.create(:email => params[:email],
                        :password => params[:password],
                        :password_confirmation => params[:password_confirmation])
-    session[:user_id] = user.id 
-    redirect to('/')
+    
+    if @user.save
+      session[:user_id] = @user.id
+      redirect to('/')
+    else
+      flash[:notice] = "Sorry, your passwords don't match"
+      erb :"users/new"
+    end
   end
 
   get '/tags/:text' do
