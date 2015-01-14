@@ -4,7 +4,7 @@ require './lib/user'
 
 require './lib/tag'
 
-require './lib/database_setup'
+require './app/database_setup'
 
 require 'rack-flash'
 
