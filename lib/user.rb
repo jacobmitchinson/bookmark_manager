@@ -10,11 +10,11 @@ class User
   include DataMapper::Resource
 
   property :id, Serial
-  property :email, String, :unique => true
+  property :email, String, :unique => true, :message => "This email is already taken"
 
   property :password_digest, Text
 
-  validates_confirmation_of :password
+  validates_confirmation_of :password, :message => "Sorry, your passwords don't match"
 
   def password=(password)
     @password = password
