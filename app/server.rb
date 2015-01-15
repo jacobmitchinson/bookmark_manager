@@ -1,12 +1,9 @@
 require 'sinatra/base'
-
 require './lib/user'
-
 require './lib/tag'
-
 require './app/database_setup'
-
 require 'rack-flash'
+require 'sinatra/partial'
 
 require_relative './helpers/application_helper'
 
@@ -15,6 +12,8 @@ class BookmarkManager < Sinatra::Base
   use Rack::Flash
   enable :sessions
   set :session_secret, 'super_secret'
+  register Sinatra::Partial
+  set :partial_template_engine, :erb
 
   # set :views, File.expand_path('../../views', __FILE__)
   set :views, Proc.new { File.join(root, "views") }
