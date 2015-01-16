@@ -47,7 +47,6 @@ get '/users/reset/:token' do
 end
 
 post '/sessions/password_reset' do 
-  puts "hello"
   password = params[:password]
   password_confirmation = params[:password_confirmation]
   token = params[:password_token]
