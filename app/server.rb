@@ -1,89 +1,58 @@
-require 'sinatra/base'
-require './lib/user'
-require './lib/tag'
-require './app/database_setup'
+require 'sinatra'
+require 'data_mapper'
 require 'rack-flash'
 require 'sinatra/partial'
+require_relative "models/link"
+require_relative 'models/tag'
+require_relative "models/user"
+require_relative 'helpers/application_helper'
+require_relative 'database_setup'
+
+require_relative 'controllers/users'
+require_relative 'controllers/sessions'
+require_relative 'controllers/links'
+require_relative 'controllers/tags'
+require_relative 'controllers/application'
 
 require_relative './helpers/application_helper'
 
-class BookmarkManager < Sinatra::Base
-  use Rack::MethodOverride
-  use Rack::Flash
-  enable :sessions
-  set :session_secret, 'super_secret'
-  register Sinatra::Partial
-  set :partial_template_engine, :erb
+use Rack::MethodOverride
+use Rack::Flash
+enable :sessions
+set :session_secret, 'super_secret'
+register Sinatra::Partial
+set :partial_template_engine, :erb
 
-  # set :views, File.expand_path('../../views', __FILE__)
-  set :views, Proc.new { File.join(root, "views") }
-  
-  helpers ApplicationHelper
+# set :views, File.expand_path('../../views', __FILE__)
+set :views, Proc.new { File.join(root, "views") }
 
-  get '/' do
-    @links = Link.all
-    erb :index
-  end
+helpers ApplicationHelper
 
-  post '/links' do
-    url = params["url"]
-    title = params["title"]
-    tags = params["tags"].split(" ").map do |tag|
-      # this will either find this tag or create
-      # it if it doesn't exist already
-      Tag.first_or_create(:text => tag)
-    end
-    Link.create(:url => url, :title => title, :tags => tags)
-    redirect to('/')
-  end
+get '/users/reset' do 
+  erb :'users/reset'
+end
 
-  get '/users/new' do 
-    @user = User.new
-    erb :"users/new"
-  end
+post '/users/reset' do 
+  email = params[:email]
+  user = User.first(:email => email)
+  user.password_token = (1..64).map{('A'..'Z').to_a.sample}.join
+  user.save
+  erb :'users/reset'
+end
 
-  post '/users' do 
-    @user = User.create(:email => params[:email],
-                       :password => params[:password],
-                       :password_confirmation => params[:password_confirmation])
-    
-    if @user.save
-      session[:user_id] = @user.id
-      redirect to('/')
-    else
-      flash.now[:errors] = @user.errors.full_messages
-      erb :"users/new"
-    end
-  end
+get '/users/reset/:token' do 
+  user = User.first(:password_token => params[:token])
+  @token = user.password_token
+  erb :'users/change_password'
+end
 
-  get '/sessions/new' do 
-    erb :"sessions/new"
-  end
-
-  post '/sessions' do 
-    email, password = params[:email], params[:password]
-    user = User.authenticate(email, password)
-    if user
-      session[:user_id] = user.id
-      redirect to('/')
-    else
-      flash[:errors] = ["The email or password is incorrect"]
-      erb :"sessions/new"
-    end
-  end
-
-  get '/tags/:text' do
-    tag = Tag.first(:text => params[:text])
-    @links = tag ? tag.links : []
-    erb :index
-  end
-
-  delete '/sessions' do
-    flash[:notice] ="Good bye!"
-    session[:user_id] = nil
-    redirect to('/')
-  end
-  
-  # start the server if ruby file executed directly
-  run! if app_file == $0
+post '/sessions/password_reset' do 
+  puts "hello"
+  password = params[:password]
+  password_confirmation = params[:password_confirmation]
+  token = params[:password_token]
+  user = User.first(:password_token => token)
+  user.update(:password => password, :password_confirmation => password_confirmation)
+  user.password_digest
+  user.save
 end

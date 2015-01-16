@@ -11,7 +11,7 @@ class User
 
   property :id, Serial
   property :email, String, :unique => true, :message => "This email is already taken"
-
+  property :password_token, Text
   property :password_digest, Text
 
   validates_confirmation_of :password, :message => "Sorry, your passwords don't match"
@@ -30,6 +30,10 @@ class User
       nil
     end
     
+  end
+
+  def self.new_password(user, password)
+    user.password_digest = BCrypt::Password.create(password)
   end
 
 end

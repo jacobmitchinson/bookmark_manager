@@ -1,7 +1,7 @@
 require 'data_mapper'
-require './lib/tag'
-require './lib/user'
-require './lib/link'
+require './app/models/tag'
+require './app/models/user'
+require './app/models/link'
 require './app/database_setup'
 
 task :auto_upgrade do
